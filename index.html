@@ -4,19 +4,19 @@
 <h1>Trading kalkulačka</h1><p>Scale-in se dvěma vstupy, pevným rizikem a runnerem. Výsledky v R i v penězích. Výpočty probíhají v zařízení.</p>
 <section class="card"><h2>1 · Vstupy a riziko</h2><div class="fields">
 <label class="field">Směr<select id="side"><option value="long">Long</option><option value="short">Short</option></select></label>
-<label class="field">Plánované riziko (Kč)<input id="budget" type="number" min="0" step="any" value="250"></label>
-<label class="field">První vstup (USD)<input id="e1" type="number" step="any" value="45.81"></label>
-<label class="field">Druhý vstup (USD)<input id="e2" type="number" step="any" value="45.05"></label>
-<label class="field">Stop-loss (USD)<input id="sl" type="number" step="any" value="44.44"></label>
+<label class="field">Plánované riziko (Kč)<input id="budget" type="number" min="0" step="any" value=""></label>
+<label class="field">První vstup (USD)<input id="e1" type="number" step="any" value=""></label>
+<label class="field">Druhý vstup (USD)<input id="e2" type="number" step="any" value=""></label>
+<label class="field">Stop-loss (USD)<input id="sl" type="number" step="any" value=""></label>
 <label class="field">USD/CZK (pro převod)<input id="fx" type="number" min="0" step="any" value="21"></label>
 <label class="field full">Podíl plánovaného rizika na prvním vstupu (%)<input id="share" type="number" min="0" max="100" step="any" value="50"></label>
 <label class="field full">Druhý vstup byl aktivován?<select id="filled"><option value="yes">Ano, oba vstupy</option><option value="no">Ne, jen první vstup</option></select></label></div>
 <p class="note">Rozdělení 50/50 znamená polovinu peněžního rizika každému vstupu, nikoli stejný počet akcií. Model počítá i zlomkové akcie; skutečný broker může vyžadovat zaokrouhlení.</p></section>
 <section class="card"><h2>2 · Výstupy</h2><div class="fields">
-<label class="field">První take-profit (USD)<input id="tp" type="number" step="any" value="47.91"></label>
+<label class="field">První take-profit (USD)<input id="tp" type="number" step="any" value=""></label>
 <label class="field">Uzavřeno na TP (%)<input id="closed" type="number" step="any" min="0" max="100" value="90"></label>
 <label class="field full">Výstup runneru<select id="runmode"><option value="be">Break-even (na průměrném vstupu)</option><option value="price">Vlastní výstupní cena</option><option value="sl">Původní stop-loss</option></select></label>
-<label class="field full" id="runnerfield">Cena výstupu runneru (USD)<input id="runner" type="number" step="any" value="54.44"></label></div>
+<label class="field full" id="runnerfield">Cena výstupu runneru (USD)<input id="runner" type="number" step="any" value=""></label></div>
 <p class="note">Při volbě break-even se runner uzavře na vážené průměrné vstupní ceně skutečně otevřených nákupů. Jeho zisk pak činí 0 Kč před náklady. Další posuny SL nejsou modelovány.</p></section>
 <section class="card"><h2>3 · Výsledek</h2><div id="error" class="err hide" role="alert"></div><div id="results"><div class="stats">
 <div class="stat"><small>Celkové realizované R vůči plánovanému riziku</small><strong id="totalr" class="good">—</strong></div>
@@ -27,21 +27,21 @@
 <div class="stat"><small>Výsledek runneru (R)</small><strong id="runr">—</strong></div></div>
 <h2 style="margin-top:24px">Detail pozic</h2><table class="breakdown"><thead><tr><th>Vstup</th><th>Akcie*</th><th>Riziko Kč</th></tr></thead><tbody><tr><td>První</td><td id="q1">—</td><td id="rk1">—</td></tr><tr><td>Druhý</td><td id="q2">—</td><td id="rk2">—</td></tr></tbody></table>
 <p class="note">* Teoretická velikost pozice bez zaokrouhlení. Výsledek před poplatky, spreadem, skluzem a daněmi. Kurz zadáváš ručně, není živý.</p></div>
-<div class="buttons"><button id="copy">Kopírovat výsledek</button><button id="reset" class="secondary">Obnovit příklad KR</button></div><p id="copymsg" class="note" aria-live="polite"></p></section>
-<p class="note">Verze 1.1 · Údaje se neodesílají na server. Nastavení zůstávají v tomto prohlížeči, pokud umožňuje místní úložiště.</p></main>
+<div class="buttons"><button id="copy">Kopírovat výsledek</button><button id="reset" class="secondary">Nový obchod / vymazat</button></div><p id="copymsg" class="note" aria-live="polite"></p></section>
+<p class="note">Verze 1.2 · Údaje se neodesílají na server. Každý nový obchod začíná s prázdnými cenovými poli.</p></main>
 <script>
 (function(){
 'use strict';
 var ids=['side','budget','e1','e2','sl','fx','share','filled','tp','closed','runmode','runner'];
-var defaults={side:'long',budget:'250',e1:'45.81',e2:'45.05',sl:'44.44',fx:'21',share:'50',filled:'yes',tp:'47.91',closed:'90',runmode:'be',runner:'54.44'};
+var defaults={side:'long',budget:'',e1:'',e2:'',sl:'',fx:'21',share:'50',filled:'yes',tp:'',closed:'90',runmode:'be',runner:''};
 function el(id){return document.getElementById(id)}
-function num(id){return Number(String(el(id).value).replace(',','.'))}
+function num(id){var raw=String(el(id).value).trim();return raw===''?NaN:Number(raw.replace(',','.'))}
 function fmt(x,d){return Number(x).toLocaleString('cs-CZ',{minimumFractionDigits:d===undefined?2:d,maximumFractionDigits:d===undefined?2:d})}
 var summary='';
 function calc(){
 var side=el('side').value,budget=num('budget'),e1=num('e1'),e2=num('e2'),sl=num('sl'),fx=num('fx'),share=num('share')/100,filled=el('filled').value==='yes',tp=num('tp'),closed=num('closed')/100,mode=el('runmode').value,sign=side==='long'?1:-1;
 el('runnerfield').style.display=mode==='price'?'block':'none';
-var runnerInput=num('runner'),values=[budget,e1,e2,sl,fx,share,tp,closed];if(mode==='price')values.push(runnerInput);
+var runnerInput=mode==='price'?num('runner'):0,values=[budget,e1,e2,sl,fx,share,tp,closed];if(mode==='price')values.push(runnerInput);
 var invalid=values.some(function(v){return !Number.isFinite(v)})||budget<=0||fx<=0||share<0||share>1||closed<0||closed>1||sign*(e1-sl)<=0||(filled&&sign*(e2-sl)<=0);
 var err=el('error');
 if(invalid){err.textContent='Zkontroluj hodnoty. Riziko a kurz musí být kladné; aktivované vstupy musí být na správné straně SL. Podíly musí být mezi 0 a 100 %.';err.classList.remove('hide');el('results').classList.add('hide');el('copy').disabled=true;return}
@@ -62,15 +62,15 @@ el('runr').textContent=(runPnl>=0?'+':'')+fmt(runPnl/budget)+' R';
 el('q1').textContent=fmt(q1,4);el('q2').textContent=fmt(q2,4);
 el('rk1').textContent=fmt(risk1);el('rk2').textContent=fmt(risk2);
 summary='Trading kalkulačka | '+side.toUpperCase()+' | entry '+e1+' / '+e2+' USD | 2. vstup '+(filled?'ano':'ne')+' | SL '+sl+' | TP '+tp+' ('+fmt(closed*100,0)+' %) | runner '+(mode==='be'?'BE':mode==='sl'?'SL':runner)+' ('+fmt(runner,3)+' USD) | plánované riziko '+fmt(budget)+' Kč | výsledek '+(r>=0?'+':'')+fmt(r)+' R / '+fmt(pnl)+' Kč | riziko využité '+fmt(used)+' Kč | průměrný vstup '+fmt(avg,3)+' | USD/CZK '+fx;
-try{var state={};ids.forEach(function(id){state[id]=el(id).value});localStorage.setItem('trading-calc-2',JSON.stringify(state))}catch(ex){}
+
 }
 ids.forEach(function(id){el(id).addEventListener('input',calc);el(id).addEventListener('change',calc)});
-el('reset').addEventListener('click',function(){ids.forEach(function(id){el(id).value=defaults[id]});calc();el('copymsg').textContent='Příklad KR obnoven.'});
+el('reset').addEventListener('click',function(){ids.forEach(function(id){el(id).value=defaults[id]});calc();el('copymsg').textContent='Pole vymazána.'});
 el('copy').addEventListener('click',function(){
 if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(summary).then(function(){el('copymsg').textContent='Výsledek zkopírován.'},fallback)}else{fallback()}
 function fallback(){var area=document.createElement('textarea');area.value=summary;document.body.appendChild(area);area.select();var ok=false;try{ok=document.execCommand('copy')}catch(ex){}area.remove();el('copymsg').textContent=ok?'Výsledek zkopírován.':'Kopírování není v tomto prohlížeči dostupné.'}
 });
-try{var saved=JSON.parse(localStorage.getItem('trading-calc-2')||'null');if(saved)ids.forEach(function(id){if(saved[id]!==undefined)el(id).value=saved[id]})}catch(ex){}
+try{localStorage.removeItem('trading-calc-2')}catch(ex){}
 calc();
 })();
 </script></body></html>
