@@ -3,20 +3,20 @@
 <style>:root{color-scheme:dark;--bg:#0b1220;--panel:#172235;--muted:#a4b2c7;--line:#34445b;--accent:#5ee0b5;--ink:#f2f6fd}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}main{max-width:750px;margin:auto;padding:24px 16px 50px}h1{font-size:1.65rem;margin:0 0 8px}p{color:var(--muted);line-height:1.5}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin:14px 0}h2{font-size:1.05rem;margin:0 0 15px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.field{display:block;font-size:.83rem;color:var(--muted)}input,select{display:block;width:100%;border-radius:9px;border:1px solid #516077;background:#0b1526;color:var(--ink);padding:12px;font-size:16px;margin-top:6px}input:focus{outline:2px solid var(--accent)}.full{grid-column:1/-1}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#0b1526;border-radius:12px;padding:14px}.stat small{color:var(--muted);display:block;line-height:1.4}.stat strong{font-size:1.4rem;display:block;margin-top:5px}.good{color:var(--accent)}.bad{color:#ff9a9a}.note{font-size:.85rem;color:var(--muted)}.err{color:#ff9a9a;font-size:.95rem;margin:8px 0}button{border:0;background:var(--accent);color:#072116;font-size:16px;font-weight:700;padding:13px 15px;border-radius:10px;cursor:pointer}button.secondary{background:#30445b;color:white}button:disabled{opacity:.5}.buttons{display:flex;flex-wrap:wrap;gap:10px}.breakdown{width:100%;border-collapse:collapse}th,td{padding:10px 5px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}th:first-child,td:first-child{text-align:left}th{font-size:.75rem;color:var(--muted)}.hide{display:none}@media(max-width:440px){.stat strong{font-size:1.17rem}main{padding:17px 12px 40px}.card{padding:14px}.fields{gap:10px}}</style></head><body><main>
 <h1>Trading kalkulačka</h1><p><a href="velikost-pozice.html" style="color:var(--accent)">Kalkulačka velikosti pozice →</a></p><p>Scale-in se dvěma vstupy, pevným rizikem a runnerem. Výsledky v R i v penězích. Výpočty probíhají v zařízení.</p>
 <section class="card"><h2>1 · Vstupy a riziko</h2><div class="fields">
-<label class="field">Směr<select id="side"><option value="long">Long</option><option value="short">Short</option></select></label>
+<label class="field full">Instrument<select id="instrument"><option value="stock">Akcie</option><option value="cfd">CFD · cena v bodech</option></select></label><label class="field full" id="pointfield">Hodnota 1 bodu v USD za 1 jednotku / lot<input id="point" type="number" min="0" step="any" placeholder="Podle specifikace brokera"></label><label class="field">Směr<select id="side"><option value="long">Long</option><option value="short">Short</option></select></label>
 <label class="field">Plánované riziko (Kč)<input id="budget" type="number" min="0" step="any" value=""></label>
-<label class="field">První vstup (USD)<input id="e1" type="number" step="any" value=""></label>
-<label class="field">Druhý vstup (USD)<input id="e2" type="number" step="any" value=""></label>
-<label class="field">Stop-loss (USD)<input id="sl" type="number" step="any" value=""></label>
+<label class="field">První vstup <span class="priceunit">(USD)</span><input id="e1" type="number" step="any" value=""></label>
+<label class="field">Druhý vstup <span class="priceunit">(USD)</span><input id="e2" type="number" step="any" value=""></label>
+<label class="field">Stop-loss <span class="priceunit">(USD)</span><input id="sl" type="number" step="any" value=""></label>
 <label class="field">USD/CZK (pro převod)<input id="fx" type="number" min="0" step="any" value="21"></label>
 <label class="field full">Podíl plánovaného rizika na prvním vstupu (%)<input id="share" type="number" min="0" max="100" step="any" value="50"></label>
 <label class="field full">Druhý vstup byl aktivován?<select id="filled"><option value="yes">Ano, oba vstupy</option><option value="no">Ne, jen první vstup</option></select></label></div>
-<p class="note">Rozdělení 50/50 znamená polovinu peněžního rizika každému vstupu, nikoli stejný počet akcií. Model počítá i zlomkové akcie; skutečný broker může vyžadovat zaokrouhlení.</p></section>
+<p class="note">Rozdělení 50/50 znamená polovinu peněžního rizika každému vstupu, nikoli stejný počet akcií. Model počítá i frakční objem. U CFD zadej hodnotu bodu pro objem 1,00 podle brokera, nikoli páku. Objem je teoretický; pro krok povolený brokerem použij kalkulačku velikosti pozice.</p></section>
 <section class="card"><h2>2 · Výstupy</h2><div class="fields">
-<label class="field">První take-profit (USD)<input id="tp" type="number" step="any" value=""></label>
+<label class="field">První take-profit <span class="priceunit">(USD)</span><input id="tp" type="number" step="any" value=""></label>
 <label class="field">Uzavřeno na TP (%)<input id="closed" type="number" step="any" min="0" max="100" value="90"></label>
 <label class="field full">Výstup runneru<select id="runmode"><option value="be">Break-even (na průměrném vstupu)</option><option value="price">Vlastní výstupní cena</option><option value="sl">Původní stop-loss</option></select></label>
-<label class="field full" id="runnerfield">Cena výstupu runneru (USD)<input id="runner" type="number" step="any" value=""></label></div>
+<label class="field full" id="runnerfield">Cena výstupu runneru <span class="priceunit">(USD)</span><input id="runner" type="number" step="any" value=""></label></div>
 <p class="note">Při volbě break-even se runner uzavře na vážené průměrné vstupní ceně skutečně otevřených nákupů. Jeho zisk pak činí 0 Kč před náklady. Další posuny SL nejsou modelovány.</p></section>
 <section class="card"><h2>3 · Výsledek</h2><div id="error" class="err hide" role="alert"></div><div id="results"><div class="stats">
 <div class="stat"><small>Celkové realizované R vůči plánovanému riziku</small><strong id="totalr" class="good">—</strong></div>
@@ -25,32 +25,32 @@
 <div class="stat"><small>Průměrná vstupní cena</small><strong id="avg">—</strong></div>
 <div class="stat"><small>Výsledek TP části (R)</small><strong id="tpr">—</strong></div>
 <div class="stat"><small>Výsledek runneru (R)</small><strong id="runr">—</strong></div></div>
-<h2 style="margin-top:24px">Detail pozic</h2><table class="breakdown"><thead><tr><th>Vstup</th><th>Akcie*</th><th>Riziko Kč</th></tr></thead><tbody><tr><td>První</td><td id="q1">—</td><td id="rk1">—</td></tr><tr><td>Druhý</td><td id="q2">—</td><td id="rk2">—</td></tr></tbody></table>
+<h2 style="margin-top:24px">Detail pozic</h2><table class="breakdown"><thead><tr><th>Vstup</th><th>Jednotky / loty*</th><th>Riziko Kč</th></tr></thead><tbody><tr><td>První</td><td id="q1">—</td><td id="rk1">—</td></tr><tr><td>Druhý</td><td id="q2">—</td><td id="rk2">—</td></tr></tbody></table>
 <p class="note">* Teoretická velikost pozice bez zaokrouhlení. Výsledek před poplatky, spreadem, skluzem a daněmi. Kurz zadáváš ručně, není živý.</p></div>
 <div class="buttons"><button id="copy">Kopírovat výsledek</button><button id="reset" class="secondary">Nový obchod / vymazat</button></div><p id="copymsg" class="note" aria-live="polite"></p></section>
-<p class="note">Verze 1.2 · Údaje se neodesílají na server. Každý nový obchod začíná s prázdnými cenovými poli.</p></main>
+<p class="note">Verze 1.3 · Akcie / CFD · Údaje se neodesílají na server. Každý nový obchod začíná s prázdnými cenovými poli.</p></main>
 <script>
 (function(){
 'use strict';
-var ids=['side','budget','e1','e2','sl','fx','share','filled','tp','closed','runmode','runner'];
-var defaults={side:'long',budget:'',e1:'',e2:'',sl:'',fx:'21',share:'50',filled:'yes',tp:'',closed:'90',runmode:'be',runner:''};
+var ids=['instrument','point','side','budget','e1','e2','sl','fx','share','filled','tp','closed','runmode','runner'];
+var defaults={instrument:'stock',point:'',side:'long',budget:'',e1:'',e2:'',sl:'',fx:'21',share:'50',filled:'yes',tp:'',closed:'90',runmode:'be',runner:''};
 function el(id){return document.getElementById(id)}
 function num(id){var raw=String(el(id).value).trim();return raw===''?NaN:Number(raw.replace(',','.'))}
 function fmt(x,d){return Number(x).toLocaleString('cs-CZ',{minimumFractionDigits:d===undefined?2:d,maximumFractionDigits:d===undefined?2:d})}
 var summary='';
 function calc(){
-var side=el('side').value,budget=num('budget'),e1=num('e1'),e2=num('e2'),sl=num('sl'),fx=num('fx'),share=num('share')/100,filled=el('filled').value==='yes',tp=num('tp'),closed=num('closed')/100,mode=el('runmode').value,sign=side==='long'?1:-1;
+var cfd=el('instrument').value==='cfd',point=cfd?num('point'):1;el('pointfield').style.display=cfd?'block':'none';document.querySelectorAll('.priceunit').forEach(function(x){x.textContent=cfd?'(body)':'(USD)'});var side=el('side').value,budget=num('budget'),e1=num('e1'),e2=num('e2'),sl=num('sl'),fx=num('fx'),share=num('share')/100,filled=el('filled').value==='yes',tp=num('tp'),closed=num('closed')/100,mode=el('runmode').value,sign=side==='long'?1:-1;
 el('runnerfield').style.display=mode==='price'?'block':'none';
-var runnerInput=mode==='price'?num('runner'):0,values=[budget,e1,e2,sl,fx,share,tp,closed];if(mode==='price')values.push(runnerInput);
-var invalid=values.some(function(v){return !Number.isFinite(v)})||budget<=0||fx<=0||share<0||share>1||closed<0||closed>1||sign*(e1-sl)<=0||(filled&&sign*(e2-sl)<=0);
+var runnerInput=mode==='price'?num('runner'):0,values=[budget,e1,sl,fx,point,share,tp,closed];if(filled)values.push(e2);if(mode==='price')values.push(runnerInput);
+var invalid=values.some(function(v){return !Number.isFinite(v)})||budget<=0||point<=0||fx<=0||share<0||share>1||closed<0||closed>1||sign*(e1-sl)<=0||(filled&&sign*(e2-sl)<=0);
 var err=el('error');
-if(invalid){err.textContent='Zkontroluj hodnoty. Riziko a kurz musí být kladné; aktivované vstupy musí být na správné straně SL. Podíly musí být mezi 0 a 100 %.';err.classList.remove('hide');el('results').classList.add('hide');el('copy').disabled=true;return}
+if(invalid){err.textContent='Zkontroluj hodnoty. Riziko, hodnota bodu a kurz musí být kladné; aktivované vstupy musí být na správné straně SL. Podíly musí být mezi 0 a 100 %.';err.classList.remove('hide');el('results').classList.add('hide');el('copy').disabled=true;return}
 var risk1=budget*share,risk2=filled?budget*(1-share):0;
-var q1=risk1/(Math.abs(e1-sl)*fx),q2=risk2/(Math.abs(e2-sl)*fx),qty=q1+q2,used=risk1+risk2;
+var q1=risk1/(Math.abs(e1-sl)*fx*point),q2=risk2>0?risk2/(Math.abs(e2-sl)*fx*point):0,qty=q1+q2,used=risk1+risk2;
 if(!(qty>0)){err.textContent='Žádný vstup nemá přidělené riziko.';err.classList.remove('hide');el('results').classList.add('hide');el('copy').disabled=true;return}
-var avg=(e1*q1+e2*q2)/qty,runner=mode==='be'?avg:(mode==='sl'?sl:runnerInput);
-var tpPnl=(sign*(tp-e1)*q1+sign*(tp-e2)*q2)*fx*closed;
-var runPnl=(sign*(runner-e1)*q1+sign*(runner-e2)*q2)*fx*(1-closed);
+var avg=(e1*q1+(q2?e2*q2:0))/qty,runner=mode==='be'?avg:(mode==='sl'?sl:runnerInput);
+var tpPnl=(sign*(tp-e1)*q1+(q2?sign*(tp-e2)*q2:0))*fx*point*closed;
+var runPnl=(sign*(runner-e1)*q1+(q2?sign*(runner-e2)*q2:0))*fx*point*(1-closed);
 var pnl=tpPnl+runPnl,r=pnl/budget;
 err.classList.add('hide');el('results').classList.remove('hide');el('copy').disabled=false;
 el('totalr').textContent=(r>=0?'+':'')+fmt(r)+' R';el('totalr').className=r>=0?'good':'bad';
@@ -61,7 +61,7 @@ el('tpr').textContent=(tpPnl>=0?'+':'')+fmt(tpPnl/budget)+' R';
 el('runr').textContent=(runPnl>=0?'+':'')+fmt(runPnl/budget)+' R';
 el('q1').textContent=fmt(q1,4);el('q2').textContent=fmt(q2,4);
 el('rk1').textContent=fmt(risk1);el('rk2').textContent=fmt(risk2);
-summary='Trading kalkulačka | '+side.toUpperCase()+' | entry '+e1+' / '+e2+' USD | 2. vstup '+(filled?'ano':'ne')+' | SL '+sl+' | TP '+tp+' ('+fmt(closed*100,0)+' %) | runner '+(mode==='be'?'BE':mode==='sl'?'SL':runner)+' ('+fmt(runner,3)+' USD) | plánované riziko '+fmt(budget)+' Kč | výsledek '+(r>=0?'+':'')+fmt(r)+' R / '+fmt(pnl)+' Kč | riziko využité '+fmt(used)+' Kč | průměrný vstup '+fmt(avg,3)+' | USD/CZK '+fx;
+summary='Trading kalkulačka | '+side.toUpperCase()+' | entry '+e1+' / '+(filled?e2:'—')+(cfd?' bodů':' USD')+' | hodnota bodu '+point+' USD / jednotku | 2. vstup '+(filled?'ano':'ne')+' | SL '+sl+' | TP '+tp+' ('+fmt(closed*100,0)+' %) | runner '+(mode==='be'?'BE':mode==='sl'?'SL':runner)+' ('+fmt(runner,3)+(cfd?' bodů':' USD')+') | plánované riziko '+fmt(budget)+' Kč | výsledek '+(r>=0?'+':'')+fmt(r)+' R / '+fmt(pnl)+' Kč | riziko využité '+fmt(used)+' Kč | průměrný vstup '+fmt(avg,3)+' | USD/CZK '+fx;
 
 }
 ids.forEach(function(id){el(id).addEventListener('input',calc);el(id).addEventListener('change',calc)});
